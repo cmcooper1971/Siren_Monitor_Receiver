@@ -1,0 +1,101 @@
+html {
+    font-family: Arial, Helvetica, sans-serif;
+    display: inline-block;
+    text-align: center;
+}
+
+h1 {
+    font-size: 1.8rem;
+    color: #2b79c2;
+}
+
+p {
+    font-size: 1.4rem;
+}
+
+.topnav {
+    overflow: hidden;
+    background-color: white;
+}
+
+body {
+    margin: 0;
+    background-color: white;
+}
+
+.content {
+    padding: 25px;
+}
+
+.card-grid1 {
+    max-width: 800px;
+    margin: 0 auto;
+    display: grid;
+    grid-gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.card-grid2 {
+    max-width: 800px;
+    margin: 0 auto;
+    display: grid;
+    grid-gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.card {
+    background-color: white;
+    box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #2b79c2
+}
+
+th, td {
+    text-align: center;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+tr:hover {
+    background-color: #ddd;
+}
+
+th {
+    background-color: #2b79c2;
+    color: white;
+}
+
+table {
+    margin: 0 auto;
+    width: 90%;
+}
+
+.update-time {
+    font-size: 0.8rem;
+    color: #1282A2;
+}
+
+label {
+    text-align: left;
+}
+
+/* Add these styles for transparent and right justified input fields */
+input[type="text"] {
+    border: none;
+    background: transparent;
+    text-align: center;
+    font-family: inherit; /* Inherit font family from parent element */
+    font-size: inherit; /* Inherit font size from parent element */
+}
+
+/* Adjust font size for table data */
+td {
+    font-size: 1rem; /* Adjusted font size for table data */
+}

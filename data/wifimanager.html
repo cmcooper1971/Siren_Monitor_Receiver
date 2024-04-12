@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Wi-Fi Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link rel="icon" href="data:,"> -->
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+          integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <style>
+        /* Add this style to remove border outline */
+        input[type="text"] {
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="topnav">
+        <h1>Wi-Fi Manager</h1>
+        <img src="Siren.png" width="64" height="64">
+        <br>
+    </div>
+    <div class="content">
+        <div class="card-grid1">
+            <div class="card">
+                <p class="card-title">Enter Network Details</p>
+                <form action="/" method="POST">
+                    <table>
+                        <tr>
+                            <th style="background-color: #65b0b6;">Name</th>
+                            <th style="background-color: #65b0b6;">Settings</th>
+                        </tr>
+                        <tr>
+                            <td><label for="ssid">SSID</label></td>
+                            <td> <input type="text" id="ssid" name="ssid" value=""></td>
+                        </tr>
+                        <tr>
+                            <td> <label for="pass">Password</label></td>
+                            <td> <input type="text" id="pass" name="pass" value=""></td>
+                        </tr>
+                        <tr>
+                            <td> <label for="ip">IP Address</label></td>
+                            <td> <input type="text" id="ip" name="ip" value="192.168.1.180"></td>
+                        </tr>
+                        <tr>
+                            <td> <label for="subnet">Subnet Address</label></td>
+                            <td> <input type="text" id="subnet" name="subnet" value="255.255.255.0"></td>
+                        </tr>
+                        <tr>
+                            <td> <label for="gateway">Gateway Address</label></td>
+                            <td> <input type="text" id="gateway" name="gateway" value=""></td>
+                        </tr>
+                        <tr>
+                            <td> <label for="dns">DNS Address</label></td>
+                            <td> <input type="text" id="dns" name="dns" value=""></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"> <input type="submit" value="Submit"></td>
+                        </tr>
+                    </table>
+                </form>
+                <p></p>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+<footer>
+    <div>
+        <p style="font-size: 100%;"><b>Siren Monitor 2024</b></p>
+        <p style="font-size: 100%;">Design by Christopher Cooper</p>
+    </div>
+</footer>
+
+</html>
