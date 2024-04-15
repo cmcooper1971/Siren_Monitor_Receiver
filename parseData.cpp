@@ -23,15 +23,23 @@
 
 // Variables
 
-int numEntries = 0;										// Number of entries currently in the array
-unsigned long lastEventTime = 0;						// Time since the last event was recognized
-const unsigned long detectionTimeCheckPeriod = 10000;	// Period to wait before recognizing a new event
+int numEntries = 0;												// Number of entries currently in the array
+unsigned long lastEventTime = 0;								// Time since the last event was recognized
+const unsigned long firstDetectionTimeCheckPeriod = 5000;		// Period to wait before recognizing a new event
+
+unsigned long waitSinceLastEventTime = 0;					// Time since the next event wait period
+const unsigned long waitDetectionPeriod = 10000;			// Period to wait before recognizing a new event
 
 /*-----------------------------------------------------------------*/
 
 // Parse data from serial
 
 void parseData() {
+
+	// Event count
+
+	static byte eventCount = 0;
+	static const byte totalEvents = 2;
 
 	// Set current millis time
 
@@ -52,71 +60,114 @@ void parseData() {
 
 	if (!newData.title.isEmpty() || !newData.percentage.isEmpty()) {
 
-		if (currentMillis - lastEventTime >= detectionTimeCheckPeriod) {
+		if (currentMillis - waitSinceLastEventTime >= waitDetectionPeriod) {
 
-			outputDebugLn("Event detected");
+			if ((currentMillis - lastEventTime >= firstDetectionTimeCheckPeriod)) {
 
-			// Update display
+				eventCount = 0;
 
-			newDataReceived = true;
+				Serial.print("Reset Event Count:  ");
+				Serial.println(eventCount);
 
-			// Add the new entry to the array
+			}
 
-			addEntryToArray(newData);
-
-			// Update CSV file with the new entry
-
-			appendFile(SD, fileName, newData);
+			eventCount++;
 
 			// Update the last event time
+
 			lastEventTime = currentMillis;
 
+			Serial.print("Event Count:          ");
+			Serial.println(eventCount);
+
+			if (eventCount >= totalEvents && (currentMillis - lastEventTime <= firstDetectionTimeCheckPeriod)) {
+
+				Serial.print("Event Count:          ");
+				Serial.println(eventCount);
+
+				Serial.println("Event detected");
+
+				// Update display
+
+				newDataReceived = true;
+
+				// Add the new entry to the array
+
+				addEntryToArray(newData);
+
+				// Update CSV file with the new entry
+
+				appendFile(SD, fileName, newData);
+
+				// Update the last event time
+
+				lastEventTime = currentMillis;
+
+				// clear event count
+
+				Serial.print("Reset Event Count*: ");
+				Serial.println(eventCount);
+
+				waitSinceLastEventTime = currentMillis;
+
+				eventCount = 0;
+
+			}
+
+
+			else {
+				outputDebugLn("Error: Title or percentage is blank!");
+
+			}
+
+			// Display received data
+
+			if (DEBUG == 1) {
+
+				Serial.print("Title:      ");
+				Serial.println(newData.title);
+				Serial.print("Date:       ");
+				Serial.println(newData.date);
+				Serial.print("Time:       ");
+				Serial.println(newData.time);
+				Serial.print("Catagory:   ");
+				Serial.println(newData.category);
+				Serial.print("Accuracy:   ");
+				Serial.println(newData.percentage);
+				Serial.println();
+
+				// Print data entry temporary array
+
+				Serial.println("-------------------------------------------------------------------------------");
+				Serial.println("Data Array Table");
+
+				for (int i = 0; i < numEntries; i++) {
+					Serial.print("| ");
+					printPadded(dataEntries[i].title, 15);
+					Serial.print(" | ");
+					printPadded(dataEntries[i].date, 15);
+					Serial.print(" | ");
+					printPadded(dataEntries[i].time, 15);
+					Serial.print(" | ");
+					printPadded(dataEntries[i].category, 15);
+					Serial.print(" | ");
+					printPadded(dataEntries[i].percentage, 15);
+					Serial.println(" | ");
+
+				}
+				Serial.println("-------------------------------------------------------------------------------");
+				Serial.println();
+
+			}
+
 		}
 
-	}
+		else {
 
-	else {
-		outputDebugLn("Error: Title or percentage is blank!");
-
-	}
-
-	// Display received data
-
-	if (DEBUG == 1) {
-
-		Serial.print("Title:      ");
-		Serial.println(newData.title);
-		Serial.print("Date:       ");
-		Serial.println(newData.date);
-		Serial.print("Time:       ");
-		Serial.println(newData.time);
-		Serial.print("Catagory:   ");
-		Serial.println(newData.category);
-		Serial.print("Percentage: ");
-		Serial.println(newData.percentage);
-		Serial.println();
-
-		// Print data entry temporary array
-
-		Serial.println("-------------------------------------------------------------------------------");
-		Serial.println("Data Array Table");
-
-		for (int i = 0; i < numEntries; i++) {
-			Serial.print("| ");
-			printPadded(dataEntries[i].title, 15);
-			Serial.print(" | ");
-			printPadded(dataEntries[i].date, 15);
-			Serial.print(" | ");
-			printPadded(dataEntries[i].time, 15);
-			Serial.print(" | ");
-			printPadded(dataEntries[i].category, 15);
-			Serial.print(" | ");
-			printPadded(dataEntries[i].percentage, 15);
-			Serial.println(" | ");
+			Serial.print("Wait 10 seconds...");
+			Serial.println("");
 
 		}
-		Serial.println("-------------------------------------------------------------------------------");
-		Serial.println();
 
 	}
 
@@ -295,7 +346,7 @@ void populateArrayFromCSV(fs::FS& fs, const char* path, bleSignal* dataEntries, 
 		outputDebug(dataEntries[i].time);
 		outputDebug(", Catagory: ");
 		outputDebug(dataEntries[i].category);
-		outputDebug(", Percentage: ");
+		outputDebug(", Accuracy: ");
 		outputDebugLn(dataEntries[i].percentage);
 
 		numEntries++;

@@ -410,7 +410,7 @@ void categorizeEntries(fs::FS& fs, const char* path) {
 				tft.setCursor(130, 148);
 				tft.println(data.category);
 				tft.setCursor(20, 168);
-				tft.print("Percentage:");
+				tft.print("Accuracy:");
 				tft.setCursor(130, 168);
 				tft.print(data.percentage);
 				tft.println("%");
@@ -428,7 +428,7 @@ void categorizeEntries(fs::FS& fs, const char* path) {
 				outputDebugLn(data.time);
 				outputDebug("Updated Category:   ");
 				outputDebugLn(data.category);
-				outputDebug("Updated Percentage: ");
+				outputDebug("Updated Accuracy: ");
 				outputDebug(data.percentage);
 				outputDebugLn("");
 
@@ -475,8 +475,8 @@ void categorizeEntries(fs::FS& fs, const char* path) {
 		tft.fillRect(39, 60, 183, 40, WHITE);
 		tft.setFreeFont(&FreeSans12pt7b);
 		tft.setTextSize(1);
-		tft.setTextColor(DKBLUE); tft.setCursor(45, 88);
-		tft.print("All categories Set");
+		tft.setTextColor(DKBLUE); tft.setCursor(40, 88);
+		tft.print("All Categories Set");
 
 		delay(1500);
 
