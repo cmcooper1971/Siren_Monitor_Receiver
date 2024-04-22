@@ -187,23 +187,6 @@ void appendFile(fs::FS& fs, const char* path, bleSignal newData) {
 
 	// Append the message to the file
 
-	//if (!file) {
-	//	Serial.println("Failed to open file for appending");
-	//	return;
-	//}
-
-	//file.print(newData.title);
-	//file.print(",");
-	//file.print(newData.date);
-	//file.print(",");
-	//file.print(newData.time);
-	//file.print(","); 
-	//file.print(newData.category);
-	//file.print(",");
-	//file.print(newData.percentage);
-	//file.print("\r\n"); // Ensure this is directly being printed
-	//file.close();
-
 	if (file.println(message)) {
 		
 		outputDebug("Message appended = ");
@@ -464,15 +447,15 @@ void categorizeEntries(fs::FS& fs, const char* path) {
 				outputDebug(data.percentage);
 				outputDebugLn("");
 					
-				line = lineEnding + toCSVLine(data);  // Convert the updated struct back to a CSV line
-				updated = true;  // Mark as updated
+				line = lineEnding + toCSVLine(data);	// Convert the updated struct back to a CSV line
+				updated = true;							// Mark as updated
 			}
 		}
 
 		writeFile.print(line + '%');
 
 		if (updated) {
-			break;  // Exit the loop after updating the first 'U'
+			break;										// Exit the loop after updating the first 'U'
 		}
 	}
 
@@ -526,17 +509,11 @@ void addManualEntry(fs::FS& fs, const char* path) {
 
 	char timeBuffer[20];
 	time_t now = time(nullptr);
-	strftime(timeBuffer, sizeof(timeBuffer), "%d-%m-%Y,%H:%M:%S", localtime(&now)); // Ensure the format matches your CSV
+	strftime(timeBuffer, sizeof(timeBuffer), "%d-%m-%Y,%H:%M:%S", localtime(&now));
 
-	// Construct the new entry with 'M' for manual
-	// Assuming the format is "Title, Date, Time, Category, Percentage"
-	// Here, Percentage can be a default or placeholder value like "100%"
-
-	// Update the category
+	// Construct the new entry with 'M' for manual and update the category
 
 	String tempCat = waitForCategorySelection();
-
-	//String newEntry = "Manual," + String(timeBuffer) + ",M,100%";
 
 	String newEntry = "Manual," + String(timeBuffer) + ",ME-" + tempCat + ",100%";
 
@@ -557,8 +534,6 @@ void addManualEntry(fs::FS& fs, const char* path) {
 	file.close();
 
 	Serial.println("Manual entry added: " + newEntry);
-
-
 
 } // Close function
 
@@ -654,18 +629,18 @@ void deleteLastEntry(fs::FS& fs, const char* path) {
 
 	if (readFile.available()) {
 		lastLine = readFile.readStringUntil('\n');
-		lastLine.trim(); // Clean up the line
+		lastLine.trim();								// Clean up the line
 	}
 
 	// Process all remaining lines
 
 	while (readFile.available()) {
 		currentLine = readFile.readStringUntil('\n');
-		currentLine.trim(); // Clean up the line
+		currentLine.trim();								// Clean up the line
 
 		if (!currentLine.isEmpty()) {
-			writeFile.println(lastLine);  // Write the previous line to the file
-			lastLine = currentLine;  // Update lastLine to current
+			writeFile.println(lastLine);				// Write the previous line to the file
+			lastLine = currentLine;						// Update lastLine to current
 		}
 	}
 

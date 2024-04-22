@@ -48,7 +48,7 @@ void parseData() {
 	// Read data into String
 
 	dataReceived = "";
-	dataReceived = Serial2.readStringUntil('%');
+	dataReceived = Serial2.readStringUntil('%');		// '%' isnt included in the data
 
 	outputDebug("Data received from Serial 2: ");
 	outputDebugLn(dataReceived);
@@ -62,7 +62,11 @@ void parseData() {
 
 	if (!newData.title.isEmpty() || !newData.percentage.isEmpty()) {
 
+		// Check if signal is within first wait period
+
 		if (currentMillis - waitSinceLastEventTime >= waitDetectionPeriod) {
+
+			// Check if over all period has exceeded and reset event count
 
 			if ((currentMillis - lastEventTime >= firstDetectionTimeCheckPeriod)) {
 
@@ -73,6 +77,8 @@ void parseData() {
 
 			}
 
+			// Increment event count
+
 			eventCount++;
 
 			// Update the last event time
@@ -81,6 +87,8 @@ void parseData() {
 
 			Serial.print("Event Count:          ");
 			Serial.println(eventCount);
+
+			// Check if event count has reached preset quantity and within time period
 
 			if (eventCount >= totalEvents && (currentMillis - lastEventTime <= firstDetectionTimeCheckPeriod)) {
 
@@ -141,6 +149,8 @@ void parseData() {
 
 		else {
 
+			// After successful event, wait 10 seconds before a new event can be recorded
+
 			Serial.print("Wait 10 seconds...");
 			Serial.println("");
 
@@ -166,6 +176,8 @@ bleSignal parseDataS(String dataReceived) {
 
 	bleSignal newData;
 
+	// Ensure struct is empty
+
 	newData.title = "";
 	newData.date = "";
 	newData.time = "";
@@ -179,9 +191,9 @@ bleSignal parseDataS(String dataReceived) {
 
 		// Extract date from timeinfo
 
-		char date[11]; // Format: YYYY-MM-DD
-		snprintf(date, sizeof(date), "%02d-%02d-%04d",
-			timeinfo.tm_mday, timeinfo.tm_mon + 1, timeinfo.tm_year + 1900);
+		char date[11]; // Format: DD-MM-YYYY
+
+		snprintf(date, sizeof(date), "%02d-%02d-%04d", timeinfo.tm_mday, timeinfo.tm_mon + 1, timeinfo.tm_year + 1900);
 
 		// Assign date to newData
 
@@ -190,8 +202,8 @@ bleSignal parseDataS(String dataReceived) {
 		// Extract time from timeinfo
 
 		char time[9]; // Format: HH:MM:SS
-		snprintf(time, sizeof(time), "%02d:%02d:%02d",
-			timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
+
+		snprintf(time, sizeof(time), "%02d:%02d:%02d", timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
 
 		// Assign time to newData
 
@@ -206,37 +218,26 @@ bleSignal parseDataS(String dataReceived) {
 
 	if (commaIndex1 != -1 && commaIndex2 != -1) {
 
-		// Extract and trim title
+		// Extract and trim title - Trim is needed to remove control characters from serial inputs
+
 		newData.title = dataReceived.substring(0, commaIndex1);
-		newData.title.trim();  // Properly apply trim to the extracted substring
+
+		newData.title.trim();		// Properly apply trim to the extracted substring
 
 		// Extract and trim category
+
 		newData.category = dataReceived.substring(commaIndex1 + 1, commaIndex2);
-		newData.category.trim();  // Properly apply trim to the extracted substring
+
+		newData.category.trim();	// Properly apply trim to the extracted substring
 
 		// Extract and trim percentage
+
 		newData.percentage = dataReceived.substring(commaIndex2 + 1);
+
 		newData.percentage.trim();  // Properly apply trim to the extracted substring
-		newData.percentage += '%'; // Append percentage sign
+		newData.percentage += '%';	// Append percentage sign
 
 	}
-
-	//if (commaIndex1 != -1 && commaIndex2 != -1) {
-
-	//	// Extract title
-	//	newData.title = dataReceived.substring(0, commaIndex1);
-
-	//	// Extract catagory
-	//	newData.category = dataReceived.substring(commaIndex1 + 1, commaIndex2);
-
-	//	// Extract percentage
-	//	newData.percentage = dataReceived.substring(commaIndex2 + 1);
-
-	//	String tempPercentage= newData.percentage + '%';
-
-	//	newData.percentage = tempPercentage;
-	//		
-	//}
 
 	return newData;
 
@@ -294,16 +295,6 @@ void populateArrayFromCSV(fs::FS& fs, const char* path, bleSignal* dataEntries, 
 		outputDebug("Total number of rows in CSV file: ");
 		outputDebugLn(totalRows);
 		outputDebugLn("");
-
-	// Ensure we have enough rows to populate the array
-
-	//if (totalRows < 1) {
-
-	//	outputDebugLn("");
-	//	outputDebugLn("Not enough rows in CSV file");
-	//	file.close();
-	//	return;
-	//}
 
 	// Start reading from the beginning of the file
 

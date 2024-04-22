@@ -19,6 +19,8 @@
 
 /*---------------------------------------------------------------- */
 
+// Function to check Arduino Nano is still alive
+
 void sensorCheckCall(boolean interruptDetected, const unsigned long interruptCheckPeriod, const byte interruptCount, byte nanoResetPin) {
 
     static unsigned long lastCheckTime = 0;

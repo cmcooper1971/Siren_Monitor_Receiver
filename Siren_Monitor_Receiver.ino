@@ -135,7 +135,7 @@ void setup() {
 
 	// Setup Serial 1 for Nano BLE Communications
 
-	Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);	// initialize UART
+	Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);	// Initialize UART
 
 	delay(100);
 
@@ -223,7 +223,7 @@ void setup() {
 
 	playTone(buzzerP, buzzerF, buzzerD);
 
-	// Initialise TFT display
+	// Initialize TFT display
 
 	tft.begin();
 
@@ -285,7 +285,7 @@ void setup() {
 	int eeCalDataAddress3 = 320;				// EEPROM address for touch screen calibration data.
 	int eeCalDataAddress4 = 324;				// EEPROM address for touch screen calibration data.
 
-	EEPROM.get(eeCalYNAddress, calTouchScreen);				// Load touch screen calibration data.
+	EEPROM.get(eeCalYNAddress, calTouchScreen);	// Load touch screen calibration data.
 	EEPROM.get(eeCalDataAddress0, calData[0]);
 	EEPROM.get(eeCalDataAddress1, calData[1]);
 	EEPROM.get(eeCalDataAddress2, calData[2]);
@@ -321,7 +321,7 @@ void setup() {
 
 	checkWiFiReset(wiFiReset);
 
-	// Intialise WiFIi
+	// Intialize WiFIi
 
 	initialiseWiFi();
 
