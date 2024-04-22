@@ -58,7 +58,7 @@ String readFile(fs::FS& fs, const char* path) {
 
 	while (file.available()) {
 
-		fileContent = file.readStringUntil('\n');
+		fileContent = file.readStringUntil('\r\n');
 		break;
 	}
 
@@ -153,7 +153,7 @@ bool createCSVFile(const char* fileName) {
 
 		// Write header to the file
 
-		file.println("Title,Date,Time,Category,Percentage");
+		file.println("Test,01-01-2024,00:00:00,M,100%");
 		file.close();
 		return true;
 	}
@@ -170,7 +170,7 @@ bool createCSVFile(const char* fileName) {
 
 void appendFile(fs::FS& fs, const char* path, bleSignal newData) {
 
-	Serial.printf("Appending to file: %s\n", path);
+	Serial.printf("Appending to file: %s\r\n", path);
 
 	// Open the file in append mode
 
@@ -187,9 +187,28 @@ void appendFile(fs::FS& fs, const char* path, bleSignal newData) {
 
 	// Append the message to the file
 
-	if (file.print(message)) {
-		outputDebugLn("Message appended");
+	//if (!file) {
+	//	Serial.println("Failed to open file for appending");
+	//	return;
+	//}
 
+	//file.print(newData.title);
+	//file.print(",");
+	//file.print(newData.date);
+	//file.print(",");
+	//file.print(newData.time);
+	//file.print(","); 
+	//file.print(newData.category);
+	//file.print(",");
+	//file.print(newData.percentage);
+	//file.print("\r\n"); // Ensure this is directly being printed
+	//file.close();
+
+	if (file.println(message)) {
+		
+		outputDebug("Message appended = ");
+		outputDebug(message);
+		outputDebugLn("");
 	}
 
 	else {
@@ -211,19 +230,30 @@ bleSignal parseCSVLine(const String& line) {
 
 	bleSignal data;
 	int start = 0, end = line.indexOf(',');
+
+	// Extract and trim title
 	data.title = line.substring(start, end);
+	data.title.trim();  // Clean up the title to remove any control characters and whitespace
 
 	start = end + 1; end = line.indexOf(',', start);
+	// Extract and trim date
 	data.date = line.substring(start, end);
+	data.date.trim();  // Also apply trim to ensure cleanliness
 
 	start = end + 1; end = line.indexOf(',', start);
+	// Extract and trim time
 	data.time = line.substring(start, end);
+	data.time.trim();  // Clean up time
 
 	start = end + 1; end = line.indexOf(',', start);
+	// Extract and trim category
 	data.category = line.substring(start, end);
+	data.category.trim();  // Clean up category
 
 	start = end + 1;
+	// Extract and trim percentage
 	data.percentage = line.substring(start);
+	data.percentage.trim();  // Ensure no trailing newlines or whitespace
 
 	return data;
 
@@ -332,6 +362,8 @@ String waitForCategorySelection() {
 
 void categorizeEntries(fs::FS& fs, const char* path) {
 
+	String lineEnding = "\r\n";
+
 	File readFile = fs.open(path, FILE_READ);
 
 	if (!readFile) {
@@ -431,13 +463,13 @@ void categorizeEntries(fs::FS& fs, const char* path) {
 				outputDebug("Updated Accuracy: ");
 				outputDebug(data.percentage);
 				outputDebugLn("");
-
-				line = toCSVLine(data);  // Convert the updated struct back to a CSV line
+					
+				line = lineEnding + toCSVLine(data);  // Convert the updated struct back to a CSV line
 				updated = true;  // Mark as updated
 			}
 		}
 
-		writeFile.print(line + "%");
+		writeFile.print(line + '%');
 
 		if (updated) {
 			break;  // Exit the loop after updating the first 'U'
@@ -486,9 +518,55 @@ void categorizeEntries(fs::FS& fs, const char* path) {
 
 /*-----------------------------------------------------------------*/
 
+// Function to add a manual entry to the CSV file
+
+void addManualEntry(fs::FS& fs, const char* path) {
+
+	// Get current time and date
+
+	char timeBuffer[20];
+	time_t now = time(nullptr);
+	strftime(timeBuffer, sizeof(timeBuffer), "%d-%m-%Y,%H:%M:%S", localtime(&now)); // Ensure the format matches your CSV
+
+	// Construct the new entry with 'M' for manual
+	// Assuming the format is "Title, Date, Time, Category, Percentage"
+	// Here, Percentage can be a default or placeholder value like "100%"
+
+	// Update the category
+
+	String tempCat = waitForCategorySelection();
+
+	//String newEntry = "Manual," + String(timeBuffer) + ",M,100%";
+
+	String newEntry = "Manual," + String(timeBuffer) + ",ME-" + tempCat + ",100%";
+
+	// Open the file in append mode
+
+	File file = fs.open(path, FILE_APPEND);
+
+	if (!file) {
+
+		Serial.println("Failed to open file for appending.");
+		return;
+
+	}
+
+	// Append the new entry
+
+	file.println(newEntry);
+	file.close();
+
+	Serial.println("Manual entry added: " + newEntry);
+
+
+
+} // Close function
+
+/*-----------------------------------------------------------------*/
+
 // Take a copy of the CSV file
 
-void createDataCopy(fs::FS& fs, const char* path) {
+bool createDataCopy(fs::FS& fs, const char* path) {
 
 	bool createCopy = areYouSure();
 
@@ -512,7 +590,7 @@ void createDataCopy(fs::FS& fs, const char* path) {
 
 		if (!originalFile) {
 			outputDebugLn("Failed to open the original file for reading.");
-			return;
+			return false;
 		}
 
 		File newFile = fs.open(newFilename.c_str(), FILE_WRITE);
@@ -520,7 +598,7 @@ void createDataCopy(fs::FS& fs, const char* path) {
 		if (!newFile) {
 			outputDebugLn("Failed to open the new file for writing.");
 			originalFile.close();
-			return;
+			return false;
 		}
 
 		// Copy the content
@@ -537,7 +615,73 @@ void createDataCopy(fs::FS& fs, const char* path) {
 		outputDebug("File copied to: ");
 		outputDebugLn(newFilename);
 
+		return true;
+
 	}
+
+	else return false;
+
+} // Close function
+
+/*-----------------------------------------------------------------*/
+
+// Delete last entry
+
+void deleteLastEntry(fs::FS& fs, const char* path) {
+
+	File readFile = fs.open(path, FILE_READ);
+
+	if (!readFile) {
+		Serial.println("Failed to open file for reading.");
+		return;
+	}
+
+	String tempPath = String(path) + ".tmp";
+
+	File writeFile = fs.open(tempPath.c_str(), FILE_WRITE);
+
+	if (!writeFile) {
+		Serial.println("Failed to open temporary file for writing.");
+		readFile.close();
+		return;
+	}
+
+	// Variables to track the current and previous lines
+
+	String currentLine, lastLine;
+
+	// Read first line outside of the loop to handle it separately
+
+	if (readFile.available()) {
+		lastLine = readFile.readStringUntil('\n');
+		lastLine.trim(); // Clean up the line
+	}
+
+	// Process all remaining lines
+
+	while (readFile.available()) {
+		currentLine = readFile.readStringUntil('\n');
+		currentLine.trim(); // Clean up the line
+
+		if (!currentLine.isEmpty()) {
+			writeFile.println(lastLine);  // Write the previous line to the file
+			lastLine = currentLine;  // Update lastLine to current
+		}
+	}
+
+	// The loop ends with lastLine not being written to writeFile, effectively deleting it
+
+	readFile.close();
+	writeFile.close();
+
+	// Delete the original file and rename the temp file to the original file name
+
+	if (fs.exists(path)) {
+		fs.remove(path);
+	
+	}
+
+	fs.rename(tempPath.c_str(), path);
 
 } // Close function
 

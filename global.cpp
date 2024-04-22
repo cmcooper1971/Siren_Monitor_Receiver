@@ -171,12 +171,12 @@ void printPadded(String str, int width) {
 
 bool areYouSure() {
 
-	tft.fillRect(30, 60, 210, 40, LTRED);
+	tft.fillRect(15, 60, 233, 40, LTRED);
 	tft.setFreeFont(&FreeSans12pt7b);
 	tft.setTextSize(1);
 	tft.setTextColor(DKBLUE); tft.setCursor(60, 88);
 	tft.print("Are you sure?");
-
+	
 	// Draw buttons
 
 	drawBitmap(tft, BUTTON3_Y + 1, BUTTON3_X + 1, yesPlease, BUTTON3_W - 2, BUTTON3_H - 2);

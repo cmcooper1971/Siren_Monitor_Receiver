@@ -42,7 +42,7 @@ void sensorCheckCall(boolean interruptDetected, const unsigned long interruptChe
 
                 drawBitmap(tft, PULSE_ICON_Y, PULSE_ICON_X, pulseRed, PULSE_ICON_W, PULSE_ICON_H);
 
-                delay(2000);
+                delay(1500);
 
                 playTone(buzzerP, buzzerF, buzzerD);
 

@@ -33,11 +33,11 @@
 #include "sensorFunctions.h"		// Sensor checking (is Arduino Nano responding?)
 #include "fileOperations.h"			// File operations
 #include "mainDisplay.h"			// Display layout
-#include "parseData.h"				// CSV file operations
+#include "parseDataReceived.h"		// CSV file operations
 
 // Debug serial prints
 
-#define DEBUG 1
+#define DEBUG 0
 
 #if DEBUG==1
 #define outputDebug(x); Serial.print(x);
@@ -467,12 +467,18 @@ void loop() {
 
 	// Draw screen layout
 
-	if (screenMenu == 1 && screenR == true) {
+	if (screenMenu == true) {
 
 		drawBitmap(tft, BUTTON1_Y + 1, BUTTON1_X + 1, categoriseEvents, BUTTON1_W - 2, BUTTON1_H - 2);
 		tft.drawRect(BUTTON1_X, BUTTON1_Y, BUTTON1_W, BUTTON1_H, WHITE);
 
-		screenR = false;
+		drawBitmap(tft, BUTTON2_Y + 1, BUTTON2_X + 1, manualEntry, BUTTON2_W - 2, BUTTON2_H - 2);
+		tft.drawRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, WHITE);
+
+		drawBitmap(tft, BUTTON3_Y + 1, BUTTON3_X + 1, deleteLastLine, BUTTON3_W - 2, BUTTON3_H - 2);
+		tft.drawRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, WHITE);
+
+		screenMenu = false;
 
 	}
 
@@ -504,14 +510,14 @@ void loop() {
 				outputDebug("Button 1 pressed ");
 				outputDebugLn("");
 
-				tft.fillRect(30, 60, 210, 40, LTRED);
+				tft.fillRect(15, 60, 233, 40, LTRED);
 				tft.setFreeFont(&FreeSans12pt7b);
 				tft.setTextSize(1);
 				tft.setTextColor(DKBLUE);
-				tft.setCursor(35, 88);
-				tft.print("Update Categories");
+				tft.setCursor(25, 88);
+				tft.print("Update categories?");
 				
-				delay(2000);
+				delay(1500);
 
 				// Check
 
@@ -535,8 +541,12 @@ void loop() {
 					drawBitmap(tft, BUTTON1_Y + 1, BUTTON1_X + 1, categoriseEvents, BUTTON1_W - 2, BUTTON1_H - 2);
 					tft.drawRect(BUTTON1_X, BUTTON1_Y, BUTTON1_W, BUTTON1_H, WHITE);
 					
-					tft.fillRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, WHITE);
-					tft.fillRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, WHITE);
+					drawBitmap(tft, BUTTON2_Y + 1, BUTTON2_X + 1, manualEntry, BUTTON2_W - 2, BUTTON2_H - 2);
+					tft.drawRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, WHITE);
+
+					drawBitmap(tft, BUTTON3_Y + 1, BUTTON3_X + 1, deleteLastLine, BUTTON3_W - 2, BUTTON3_H - 2);
+					tft.drawRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, WHITE);
+
 					tft.fillRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, WHITE);
 
 					populateArrayFromCSV(SD, fileName, dataEntries, maxEntries);
@@ -553,6 +563,192 @@ void loop() {
 					updateTable();
 				}
 	
+			}
+
+		}
+
+		// Button Two
+
+		if ((x > BUTTON2_X) && (x < (BUTTON2_X + BUTTON2_W))) {
+			if ((y > BUTTON2_Y) && (y <= (BUTTON2_Y + BUTTON2_H))) {
+
+				playTone(buzzerP, buzzerF, buzzerD);
+
+				outputDebug("Button 2 pressed ");
+				outputDebugLn("");
+
+				tft.fillRect(15, 60, 233, 40, LTRED);
+				tft.setFreeFont(&FreeSans12pt7b);
+				tft.setTextSize(1);
+				tft.setTextColor(DKBLUE);
+				tft.setCursor(33, 88);
+				tft.print("Add manual entry?");
+				
+				delay(1500);
+
+				// Check
+
+				bool response = areYouSure();
+
+				// Update screen layout
+
+				if (response == true) {
+
+					tft.fillRect(15, 60, 233, 40, LTRED);
+					tft.setFreeFont(&FreeSans12pt7b);
+					tft.setTextSize(1);
+					tft.setTextColor(DKBLUE);
+					tft.setCursor(50, 88);
+					tft.print("Select category");
+
+					drawBitmap(tft, BUTTON1_Y + 1, BUTTON1_X + 1, policeCar, BUTTON1_W - 2, BUTTON1_H - 2);
+					tft.drawRect(BUTTON1_X, BUTTON1_Y, BUTTON1_W, BUTTON1_H, WHITE);
+					drawBitmap(tft, BUTTON2_Y + 1, BUTTON2_X + 1, ambulance, BUTTON2_W - 2, BUTTON2_H - 2);
+					tft.drawRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, WHITE);
+					drawBitmap(tft, BUTTON3_Y + 1, BUTTON3_X + 1, fireEngine, BUTTON3_W - 2, BUTTON3_H - 2);
+					tft.drawRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, WHITE);
+					drawBitmap(tft, BUTTON4_Y + 1, BUTTON4_X + 1, falsePositive, BUTTON4_W - 2, BUTTON4_H - 2);
+					tft.drawRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, WHITE);
+
+					addManualEntry(SD, fileName);
+
+					drawBitmap(tft, BUTTON1_Y + 1, BUTTON1_X + 1, categoriseEvents, BUTTON1_W - 2, BUTTON1_H - 2);
+					tft.drawRect(BUTTON1_X, BUTTON1_Y, BUTTON1_W, BUTTON1_H, WHITE);
+
+					drawBitmap(tft, BUTTON2_Y + 1, BUTTON2_X + 1, manualEntry, BUTTON2_W - 2, BUTTON2_H - 2);
+					tft.drawRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, WHITE);
+
+					drawBitmap(tft, BUTTON3_Y + 1, BUTTON3_X + 1, deleteLastLine, BUTTON3_W - 2, BUTTON3_H - 2);
+					tft.drawRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, WHITE);
+
+					tft.fillRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, WHITE);
+
+					populateArrayFromCSV(SD, fileName, dataEntries, maxEntries);
+					updateTable();
+
+					tft.fillRect(15, 60, 233, 40, LTRED);
+					tft.setFreeFont(&FreeSans12pt7b);
+					tft.setTextSize(1);
+					tft.setTextColor(DKBLUE);
+					tft.setCursor(25, 88);
+					tft.print("Manual entry added");
+
+					delay(1500);
+
+					populateArrayFromCSV(SD, fileName, dataEntries, maxEntries);
+					updateTable();
+
+				}
+
+			}
+
+			else {
+
+				drawBitmap(tft, BUTTON1_Y + 1, BUTTON1_X + 1, categoriseEvents, BUTTON1_W - 2, BUTTON1_H - 2);
+				tft.drawRect(BUTTON1_X, BUTTON1_Y, BUTTON1_W, BUTTON1_H, WHITE);
+
+				drawBitmap(tft, BUTTON2_Y + 1, BUTTON2_X + 1, manualEntry, BUTTON2_W - 2, BUTTON2_H - 2);
+				tft.drawRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, WHITE);
+
+				drawBitmap(tft, BUTTON3_Y + 1, BUTTON3_X + 1, deleteLastLine, BUTTON3_W - 2, BUTTON3_H - 2);
+				tft.drawRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, WHITE);
+
+				populateArrayFromCSV(SD, fileName, dataEntries, maxEntries);
+				updateTable();
+			}
+
+		}
+
+		// Button three
+
+		if ((x > BUTTON3_X) && (x < (BUTTON3_X + BUTTON3_W))) {
+			if ((y > BUTTON3_Y) && (y <= (BUTTON3_Y + BUTTON3_H))) {
+
+				playTone(buzzerP, buzzerF, buzzerD);
+
+				outputDebug("Button 3 pressed ");
+				outputDebugLn("");
+
+				tft.fillRect(15, 60, 233, 40, LTRED);
+				tft.setFreeFont(&FreeSans12pt7b);
+				tft.setTextSize(1);
+				tft.setTextColor(DKBLUE);
+				tft.setCursor(40, 88);
+				tft.print("Delete last entry?");
+				
+				delay(1500);
+
+				// Check
+
+				bool response = areYouSure();
+
+				drawBitmap(tft, BUTTON3_Y + 1, BUTTON3_X + 1, deleteLastLine, BUTTON3_W - 2, BUTTON3_H - 2);
+				tft.drawRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, WHITE);
+
+				// Update screen layout
+
+				if (response == true) {
+
+					deleteLastEntry(SD, fileName);
+
+					tft.fillRect(15, 60, 233, 40, LTRED);
+					tft.setFreeFont(&FreeSans12pt7b);
+					tft.setTextSize(1);
+					tft.setTextColor(DKBLUE);
+					tft.setCursor(35, 88);
+					tft.print("Last entry deleted");
+
+					delay(1500);
+
+					drawBitmap(tft, BUTTON1_Y + 1, BUTTON1_X + 1, categoriseEvents, BUTTON1_W - 2, BUTTON1_H - 2);
+					tft.drawRect(BUTTON1_X, BUTTON1_Y, BUTTON1_W, BUTTON1_H, WHITE);
+
+					drawBitmap(tft, BUTTON2_Y + 1, BUTTON2_X + 1, manualEntry, BUTTON2_W - 2, BUTTON2_H - 2);
+					tft.drawRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, WHITE);
+
+					drawBitmap(tft, BUTTON3_Y + 1, BUTTON3_X + 1, deleteLastLine, BUTTON3_W - 2, BUTTON3_H - 2);
+					tft.drawRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, WHITE);
+
+					tft.fillRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, WHITE);
+
+					for (int i = 0; i < maxEntries; i++) {
+						dataEntries[i].title = "";
+						dataEntries[i].date = "";
+						dataEntries[i].time = "";
+						dataEntries[i].category = "";
+						dataEntries[i].percentage = "";
+					}
+
+					populateArrayFromCSV(SD, fileName, dataEntries, maxEntries);
+					updateTable();
+
+				}
+
+				else {
+
+					drawBitmap(tft, BUTTON1_Y + 1, BUTTON1_X + 1, categoriseEvents, BUTTON1_W - 2, BUTTON1_H - 2);
+					tft.drawRect(BUTTON1_X, BUTTON1_Y, BUTTON1_W, BUTTON1_H, WHITE);
+
+					drawBitmap(tft, BUTTON2_Y + 1, BUTTON2_X + 1, manualEntry, BUTTON2_W - 2, BUTTON2_H - 2);
+					tft.drawRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, WHITE);
+
+					drawBitmap(tft, BUTTON3_Y + 1, BUTTON3_X + 1, deleteLastLine, BUTTON3_W - 2, BUTTON3_H - 2);
+					tft.drawRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, WHITE);
+
+					tft.fillRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, WHITE);
+
+					for (int i = 0; i < maxEntries; i++) {
+						dataEntries[i].title = "";
+						dataEntries[i].date = "";
+						dataEntries[i].time = "";
+						dataEntries[i].category = "";
+						dataEntries[i].percentage = "";
+					}
+
+					populateArrayFromCSV(SD, fileName, dataEntries, maxEntries);
+					updateTable();
+				}
+
 			}
 
 		}
@@ -579,22 +775,54 @@ void loop() {
 
 				playTone(buzzerP, buzzerF, buzzerD);
 
-				tft.fillRect(30, 60, 210, 40, LTRED);
-				tft.setFreeFont(&FreeSans12pt7b);
-				tft.setTextSize(1);
-				tft.setTextColor(DKBLUE); tft.setCursor(60, 88);
-				tft.print("Data File Copy");
-
-				delay(2000);
-
-				createDataCopy(SD, fileName);				// Take a copy of the data file, incrementing number
-
-				populateArrayFromCSV(SD, fileName, dataEntries, maxEntries);
-				updateTable();
-
 				outputDebug("SD Icon Pressed");
 				outputDebugLn("");
 
+				tft.fillRect(15, 60, 233, 40, LTRED);
+				tft.setFreeFont(&FreeSans12pt7b);
+				tft.setTextSize(1);
+				tft.setTextColor(DKBLUE);
+				tft.setCursor(60, 88);
+				tft.print("Data file copy");
+
+				delay(1500);
+
+				bool response = (createDataCopy(SD, fileName));
+
+				if  (response == true) { 	// Take a copy of the data file, incrementing number
+
+					drawBitmap(tft, BUTTON3_Y + 1, BUTTON3_X + 1, deleteLastLine, BUTTON3_W - 2, BUTTON3_H - 2);
+					tft.drawRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, WHITE);
+						
+					tft.fillRect(15, 60, 233, 40, LTRED);
+					tft.setFreeFont(&FreeSans12pt7b);
+					tft.setTextSize(1);
+					tft.setTextColor(DKBLUE);
+					tft.setCursor(50, 88);
+					tft.print("Data file copied");
+
+					delay(1500);
+
+				}
+
+				else {
+
+					drawBitmap(tft, BUTTON3_Y + 1, BUTTON3_X + 1, deleteLastLine, BUTTON3_W - 2, BUTTON3_H - 2);
+					tft.drawRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, WHITE);
+
+					tft.fillRect(15, 60, 233, 40, LTRED);
+					tft.setFreeFont(&FreeSans12pt7b);
+					tft.setTextSize(1);
+					tft.setTextColor(DKBLUE);
+					tft.setCursor(40, 88);
+					tft.print("Abort copy / error");
+
+					delay(1500);
+
+				}
+
+				populateArrayFromCSV(SD, fileName, dataEntries, maxEntries);
+				updateTable();
 			}
 
 		}

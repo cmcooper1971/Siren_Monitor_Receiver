@@ -81,9 +81,17 @@ String waitForCategorySelection();
 
 void categorizeEntries(fs::FS& fs, const char* path);
 
+// Add manual entry
+
+void addManualEntry(fs::FS& fs, const char* path);
+
 // Create CSV file copy
 
-void createDataCopy(fs::FS& fs, const char* path);
+bool createDataCopy(fs::FS& fs, const char* path);
+
+// Delete last entry
+
+void deleteLastEntry(fs::FS& fs, const char* path);
 
 #endif
 

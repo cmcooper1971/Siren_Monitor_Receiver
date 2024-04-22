@@ -5,7 +5,7 @@
 
 // Local definitions
 
-#include "parseData.h"
+#include "parseDataReceived.h"
 #include "global.h"
 #include "fileOperations.h"
 #include "mainDisplay.h"
@@ -22,7 +22,7 @@ void parseData();
 
 // Write data to CSV & Array
 
-bleSignal parseData(String dataReceived);
+bleSignal parseDataS(String dataReceived);
 
 // Add entry to array
 

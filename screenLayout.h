@@ -37,7 +37,7 @@
 #define BUTTON1_Y 8
 #define BUTTON1_W 50
 #define BUTTON1_H 50
-                                                                                                                                                                                                                                                                                                                                                                                               
+                                                                                                                                                                                                                                                                                                                                                                                           
 // Sensor icon position and size.
 #define SENSOR_ICON_X 175
 #define SENSOR_ICON_Y 25

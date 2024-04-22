@@ -4,7 +4,7 @@
 
 // Location declarations
 
-#include "parseData.h"
+#include "parseDataReceived.h"
 #include "global.h"
 #include "fileOperations.h"
 #include "mainDisplay.h"
@@ -47,14 +47,16 @@ void parseData() {
 
 	// Read data into String
 
-	dataReceived = Serial2.readStringUntil('\n');
+	dataReceived = "";
+	dataReceived = Serial2.readStringUntil('%');
 
-	outputDebug(dataReceived);
+	outputDebug("Data received from Serial 2: ");
+	outputDebugLn(dataReceived);
 	outputDebugLn("");
 
 	// Parse the received data
 
-	bleSignal newData = parseData(dataReceived);
+	bleSignal newData = parseDataS(dataReceived);
 
 	// Check if the title and percentage are not blank
 
@@ -114,16 +116,13 @@ void parseData() {
 
 			}
 
-
-			else {
-				outputDebugLn("Error: Title or percentage is blank!");
-
-			}
-
 			// Display received data
 
 			if (DEBUG == 1) {
 
+				Serial.println("");
+				Serial.println("New Data in Parse Data Received");
+				Serial.println("");
 				Serial.print("Title:      ");
 				Serial.println(newData.title);
 				Serial.print("Date:       ");
@@ -134,28 +133,6 @@ void parseData() {
 				Serial.println(newData.category);
 				Serial.print("Accuracy:   ");
 				Serial.println(newData.percentage);
-				Serial.println();
-
-				// Print data entry temporary array
-
-				Serial.println("-------------------------------------------------------------------------------");
-				Serial.println("Data Array Table");
-
-				for (int i = 0; i < numEntries; i++) {
-					Serial.print("| ");
-					printPadded(dataEntries[i].title, 15);
-					Serial.print(" | ");
-					printPadded(dataEntries[i].date, 15);
-					Serial.print(" | ");
-					printPadded(dataEntries[i].time, 15);
-					Serial.print(" | ");
-					printPadded(dataEntries[i].category, 15);
-					Serial.print(" | ");
-					printPadded(dataEntries[i].percentage, 15);
-					Serial.println(" | ");
-
-				}
-				Serial.println("-------------------------------------------------------------------------------");
 				Serial.println();
 
 			}
@@ -171,6 +148,13 @@ void parseData() {
 
 	}
 
+	else {
+		outputDebugLn("Error: Title or percentage is blank!");
+		clearSerialBuffer();
+
+		return;
+
+	}
 
 }  // Close function
 
@@ -178,10 +162,16 @@ void parseData() {
 
 // CSV data parsing
 
-bleSignal parseData(String dataReceived) {
+bleSignal parseDataS(String dataReceived) {
 
 	bleSignal newData;
 
+	newData.title = "";
+	newData.date = "";
+	newData.time = "";
+	newData.category = "";
+	newData.percentage = "";
+	
 	// Get current local time
 
 	struct tm timeinfo;
@@ -216,15 +206,37 @@ bleSignal parseData(String dataReceived) {
 
 	if (commaIndex1 != -1 && commaIndex2 != -1) {
 
-		// Extract title
+		// Extract and trim title
 		newData.title = dataReceived.substring(0, commaIndex1);
+		newData.title.trim();  // Properly apply trim to the extracted substring
 
-		// Extract catagory
+		// Extract and trim category
 		newData.category = dataReceived.substring(commaIndex1 + 1, commaIndex2);
+		newData.category.trim();  // Properly apply trim to the extracted substring
 
-		// Extract percentage
+		// Extract and trim percentage
 		newData.percentage = dataReceived.substring(commaIndex2 + 1);
+		newData.percentage.trim();  // Properly apply trim to the extracted substring
+		newData.percentage += '%'; // Append percentage sign
+
 	}
+
+	//if (commaIndex1 != -1 && commaIndex2 != -1) {
+
+	//	// Extract title
+	//	newData.title = dataReceived.substring(0, commaIndex1);
+
+	//	// Extract catagory
+	//	newData.category = dataReceived.substring(commaIndex1 + 1, commaIndex2);
+
+	//	// Extract percentage
+	//	newData.percentage = dataReceived.substring(commaIndex2 + 1);
+
+	//	String tempPercentage= newData.percentage + '%';
+
+	//	newData.percentage = tempPercentage;
+	//		
+	//}
 
 	return newData;
 
@@ -273,24 +285,25 @@ void populateArrayFromCSV(fs::FS& fs, const char* path, bleSignal* dataEntries, 
 	int totalRows = 0;
 
 	while (file.available()) {
-		if (file.readStringUntil('%').length() > 0) {
+		if (file.readStringUntil('\n').length() > 0) {
 			totalRows++;
 		}
 	}
 
-	outputDebugLn("");
-	outputDebug("Total number of rows in CSV file: ");
-	outputDebugLn(totalRows);
-	outputDebugLn("");
+		outputDebugLn("");
+		outputDebug("Total number of rows in CSV file: ");
+		outputDebugLn(totalRows);
+		outputDebugLn("");
 
 	// Ensure we have enough rows to populate the array
 
-	if (totalRows < maxEntries) {
-		outputDebugLn("");
-		outputDebugLn("Not enough rows in CSV file");
-		file.close();
-		return;
-	}
+	//if (totalRows < 1) {
+
+	//	outputDebugLn("");
+	//	outputDebugLn("Not enough rows in CSV file");
+	//	file.close();
+	//	return;
+	//}
 
 	// Start reading from the beginning of the file
 
@@ -300,24 +313,34 @@ void populateArrayFromCSV(fs::FS& fs, const char* path, bleSignal* dataEntries, 
 
 	int startRow = totalRows - maxEntries;
 
-	for (int i = 0; i < (startRow - 1); i++) {
-		String line = file.readStringUntil('%');
+	for (int i = 0; i < (startRow); i++) {
+		String line = file.readStringUntil('\n');
 
+		outputDebug("Parse array from CSV: ")
 		outputDebug("Starting line: ");
 		outputDebugLn(line);
 		outputDebugLn("");
 
 	}
 
+	int position = 9;
+
+	if (totalRows < 10) {
+
+		position = totalRows - 1;
+	}
+
+	else position = 9;
+
 	// Read the rows and populate the array
 
 	// (int i = 0; i < maxEntries; i++)
 
-	for (int i = 9; i > -1; i--) {
+	for (int i = position; i > -1; i--) {
 
 		// Read the next line from the file
 
-		String line = file.readStringUntil('%');
+		String line = file.readStringUntil('\r\n');
 
 		// Parse the line and populate the array
 
@@ -334,7 +357,7 @@ void populateArrayFromCSV(fs::FS& fs, const char* path, bleSignal* dataEntries, 
 			dataEntries[i].date = line.substring(commaIndex1 + 1, commaIndex2);
 			dataEntries[i].time = line.substring(commaIndex2 + 1, commaIndex3);
 			dataEntries[i].category = line.substring(commaIndex3 + 1, commaIndex4);
-			dataEntries[i].percentage = line.substring(commaIndex4 + 1) + '%';
+			dataEntries[i].percentage = line.substring(commaIndex4 + 1);
 
 		}
 

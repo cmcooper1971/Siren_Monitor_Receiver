@@ -52,7 +52,7 @@
     <ClCompile Include="fileOperations.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="parseData.cpp">
+    <ClCompile Include="parseDataReceived.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="mainDisplay.cpp">
@@ -96,7 +96,7 @@
     <ClInclude Include="fileOperations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="parseData.h">
+    <ClInclude Include="parseDataReceived.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="mainDisplay.h">

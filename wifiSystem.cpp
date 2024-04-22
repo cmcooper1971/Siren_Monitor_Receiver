@@ -16,7 +16,7 @@
 #include "wifiSystem.h"
 #include "global.h"
 #include "fileOperations.h"
-#include "parseData.h"
+#include "parseDataReceived.h"
 #include "screenLayout.h"
 #include "icons.h"
 #include "drawBitmap.h"
@@ -25,7 +25,7 @@
 
 // Debug serial prints
 
-#define DEBUG 1
+#define DEBUG 0
 
 #if DEBUG==1
 #define outputDebug(x); Serial.print(x);
@@ -303,7 +303,7 @@ bool initWiFi() {
 
 	screenR = 1;
 
-	delay(3000);	// Wait a moment.
+	delay(1500);	// Wait a moment.
 
 	return true;
 
