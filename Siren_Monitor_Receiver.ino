@@ -6,6 +6,8 @@
 
 // Include libraries
 
+#include <Network.h>
+
 #include <WiFi.h>					// WiFi library
 #include <ESP32Time.h>				// NTP time server
 #include <AsyncTCP.h>				// TCP socket
@@ -307,7 +309,7 @@ void setup() {
 	// Set calibration
 
 	tft.setTouch(calData);
-
+	
 	outputDebugLn("");
 
 	// Check WiFi Reset

@@ -81,8 +81,9 @@ void configureBuzzer() {
 
 void playTone(byte pin, int freq, byte del) {
 
-    ledcSetup(0, freq, 8);
-    ledcAttachPin(pin, 0);
+	ledcAttach(pin, freq, 8);
+	// ledcSetup(0, freq, 8);
+	// ledcAttachPin(pin, 0);
     ledcWriteTone(0, freq);
     delay(del);
     ledcWriteTone(0, 0);
